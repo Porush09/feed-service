@@ -54,7 +54,7 @@ pipeline {
             steps {
                 script {
                     // Replace 'github-token' with the exact ID of your Jenkins Personal Access Token credential
-                    withCredentials([string(credentialsId: 'github-token', variable: 'GH_TOKEN')]) {
+                    withCredentials([string(credentialsId: 'Porush09', variable: 'GH_TOKEN')]) {
 
                         sh "rm -rf yt-clone-gitops-manifests"
                         sh "git clone https://${GH_TOKEN}@github.com/porushyadav/yt-clone-gitops-manifests.git"
