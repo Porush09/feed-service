@@ -51,32 +51,29 @@ pipeline {
         }
 
         stage('Update Git Manifest') {
-                    steps {
-                        script {
-                            // Changing from 'string' to 'usernamePassword' to match your actual credential type!
-                            withCredentials([usernamePassword(credentialsId: 'Porush09', usernameVariable: 'GH_USER', passwordVariable: 'GH_TOKEN')]) {
+            steps {
+                script {
+                    // Points directly to our new dedicated username/password credential entry
+                    withCredentials([usernamePassword(credentialsId: 'github-gitops-token', usernameVariable: 'GH_USER', passwordVariable: 'GH_TOKEN')]) {
 
-                                sh "rm -rf yt-clone-gitops-manifests"
+                        sh "rm -rf yt-clone-gitops-manifests"
+                        sh "git clone https://${GH_TOKEN}@github.com/porushyadav/yt-clone-gitops-manifests.git"
 
-                                // We use the token securely in the URL clone string
-                                sh "git clone https://${GH_TOKEN}@github.com/porushyadav/yt-clone-gitops-manifests.git"
+                        dir('yt-clone-gitops-manifests') {
+                            sh "sed -i 's|${SERVICE_NAME}:.*|${SERVICE_NAME}:${IMAGE_TAG}|g' ${MANIFEST_FILE}"
 
-                                dir('yt-clone-gitops-manifests') {
-                                    sh "sed -i 's|${SERVICE_NAME}:.*|${SERVICE_NAME}:${IMAGE_TAG}|g' ${MANIFEST_FILE}"
-
-                                    sh """
-                                        git config user.name "Jenkins-CI"
-                                        git config user.email "jenkins@mountblue.com"
-                                        git add ${MANIFEST_FILE}
-                                        git commit -m "chore: automated image tag update for ${SERVICE_NAME} to ${IMAGE_TAG} [skip ci]"
-                                        git push origin main
-                                    """
-                                }
-                            }
+                            sh """
+                                git config user.name "Jenkins-CI"
+                                git config user.email "jenkins@mountblue.com"
+                                git add ${MANIFEST_FILE}
+                                git commit -m "chore: automated image tag update for ${SERVICE_NAME} to ${IMAGE_TAG} [skip ci]"
+                                git push origin main
+                            """
                         }
                     }
                 }
             }
+        }
 
     post {
         success {
