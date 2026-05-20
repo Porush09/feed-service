@@ -56,7 +56,7 @@ pipeline {
                         withCredentials([usernamePassword(credentialsId: 'github-gitops-token', usernameVariable: 'GH_USER', passwordVariable: 'GH_TOKEN')]) {
 
                             sh "rm -rf yt-clone-gitops-manifests"
-                            sh "git clone https://${GH_TOKEN}@github.com/porushyadav/yt-clone-gitops-manifests.git"
+                            sh "git clone https://${GH_TOKEN}@github.com/Porush09/yt-clone-gitops-manifests.git"
 
                             dir('yt-clone-gitops-manifests') {
                                 sh "sed -i 's|${SERVICE_NAME}:.*|${SERVICE_NAME}:${IMAGE_TAG}|g' ${MANIFEST_FILE}"
