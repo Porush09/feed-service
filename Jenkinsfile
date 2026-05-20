@@ -53,14 +53,15 @@ pipeline {
         stage('Update Git Manifest') {
             steps {
                 script {
-                    // Replace 'github-token' with the exact ID of your Jenkins Personal Access Token credential
-                    withCredentials([string(credentialsId: 'Porush09', variable: 'GH_TOKEN')]) {
+                    // Changing from 'string' to 'usernamePassword' to match your actual credential type!
+                    withCredentials([usernamePassword(credentialsId: 'Porush09', usernameVariable: 'GH_USER', passwordVariable: 'GH_TOKEN')]) {
 
                         sh "rm -rf yt-clone-gitops-manifests"
+
+                        // We use the token securely in the URL clone string
                         sh "git clone https://${GH_TOKEN}@github.com/porushyadav/yt-clone-gitops-manifests.git"
 
                         dir('yt-clone-gitops-manifests') {
-                            // Find 'yt-feed-service:any-tag' and update it to 'yt-feed-service:v[BuildNumber]'
                             sh "sed -i 's|${SERVICE_NAME}:.*|${SERVICE_NAME}:${IMAGE_TAG}|g' ${MANIFEST_FILE}"
 
                             sh """
@@ -75,7 +76,6 @@ pipeline {
                 }
             }
         }
-    }
 
     post {
         success {
